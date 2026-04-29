@@ -75,11 +75,7 @@ This helped me understand both low-level and high-level approaches.
 
 ---
 
-## Demo
 
-(Add screenshots here)
-
----
 
 ## Final thoughts
 
