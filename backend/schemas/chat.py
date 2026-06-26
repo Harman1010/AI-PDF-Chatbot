@@ -1,5 +1,9 @@
 from pydantic import BaseModel
+from typing import List, Dict
+
 
 class ChatRequest(BaseModel):
-    query : str
-    #history = list[]
+
+    query: str
+
+    history: List[Dict] = []

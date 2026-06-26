@@ -26,6 +26,7 @@ async def chat(request: ChatRequest):
     return StreamingResponse(
         ask_pdf(
             request.query,
+            request.history,
             state.retriever
         ),
         media_type="text/plain"

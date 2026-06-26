@@ -1,3 +1,5 @@
+let history = [];
+
 const fileInput = document.getElementById("pdf-file");
 const uploadBtn = document.getElementById("upload-btn");
 
@@ -114,7 +116,8 @@ async function sendMessage() {
                 },
 
                 body: JSON.stringify({
-                    query: question
+                    query: question,
+                    history: history
                 })
 
             }
@@ -123,6 +126,8 @@ async function sendMessage() {
         const reader = response.body.getReader();
 
         const decoder = new TextDecoder();
+
+        let responseText = "";
 
         while (true) {
 
@@ -144,7 +149,8 @@ async function sendMessage() {
 
             }
 
-            aiText.textContent += chunk;
+            responseText += chunk;
+            aiText.innerHTML = marked.parse(responseText);
 
             chatBox.scrollTop = chatBox.scrollHeight;
 

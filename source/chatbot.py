@@ -9,7 +9,7 @@ model = ChatGoogleGenerativeAI(
 )
 
 
-def ask_pdf(query, retriever):
+def ask_pdf(query,history,retriever):
 
     docs = retriever.invoke(query)
 
@@ -32,7 +32,15 @@ def ask_pdf(query, retriever):
             sources.add(
                 f"Page {doc.metadata['page'] + 1}"
             )
+    chat_history = ""
 
+    for message in history[-3:]:
+
+        chat_history += (
+            f"User: {message['question']}\n"
+            f"Assistant: {message['answer']}\n\n"
+        )
+        
     prompt = f"""
 You are a helpful PDF assistant.
 
@@ -40,6 +48,9 @@ Answer ONLY using the provided context.
 
 If the answer is not available in the context,
 clearly mention that the document does not contain the answer.
+
+Previous Conversation:
+{chat_history}
 
 Context:
 {context}
