@@ -1,12 +1,15 @@
 from langchain_google_genai import ChatGoogleGenerativeAI
+
 from source.config import API_KEY
+
 
 model = ChatGoogleGenerativeAI(
     model="gemini-2.5-flash",
     api_key=API_KEY
 )
 
-def ask_pdf(query, history, retriever):
+
+def ask_pdf(query, retriever):
 
     docs = retriever.invoke(query)
 
@@ -23,12 +26,12 @@ def ask_pdf(query, history, retriever):
     sources = set()
 
     for doc in top_docs:
+
         if "page" in doc.metadata:
+
             sources.add(
                 f"Page {doc.metadata['page'] + 1}"
             )
-
-    chat_history = ""
 
     prompt = f"""
 You are a helpful PDF assistant.
@@ -37,9 +40,6 @@ Answer ONLY using the provided context.
 
 If the answer is not available in the context,
 clearly mention that the document does not contain the answer.
-
-Previous Conversation:
-{chat_history}
 
 Context:
 {context}
@@ -58,25 +58,19 @@ Answer:
 
         for chunk in response:
 
-            answer += chunk.content
+            if chunk.content:
 
-            yield answer
+                answer += chunk.content
+
+                yield chunk.content
+
+        if "document does not contain" not in answer.lower():
+
+            yield (
+                f"\n\nSources: "
+                f"{', '.join(sorted(sources))}"
+            )
 
     except Exception as e:
 
-        yield f"⚠️ API Error: {str(e)}"
-
-        return
-
-    if "document does not contain" in answer.lower():
-
-        yield answer
-
-        return
-
-    answer += (
-        f"\n\nSources: "
-        f"{', '.join(sorted(sources))}"
-    )
-
-    yield answer
+        yield f"\n\n API Error: {str(e)}"

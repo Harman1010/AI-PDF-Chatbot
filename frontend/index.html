@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>AI Document Assistant</title>
+
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+    <div class="container">
+
+        <header>
+
+            <h1>AI Document Assistant</h1>
+
+            <p>
+                Upload a document and ask questions using AI-powered semantic search.
+            </p>
+
+        </header>
+
+
+        <section class="upload-section">
+
+            <input type="file" id="pdf-file" accept=".pdf">
+
+            <p id="upload-status"></p>
+
+            <button id="upload-btn">
+                Upload Document
+            </button>
+
+        </section>
+
+
+        <section class="chat-section">
+
+            <div id="chat-box">
+
+                <p class="bot-message">
+                    👋 Welcome! Upload a document to begin.
+                </p>
+
+            </div>
+
+            <div class="input-area">
+
+                <input type="text" id="question" placeholder="Ask a question...">
+
+                <button id="send-btn">
+                    Send
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <section class="reset-section">
+
+            <button id="reset-btn">
+                Reset Conversation
+            </button>
+
+        </section>
+
+    </div>
+
+    <script src="script.js"></script>
+
+</body>
+
+</html>
