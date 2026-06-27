@@ -158,6 +158,8 @@ async function sendMessage() {
 
         clearTimeout(generatingTimer);
 
+        history.push({ question: question, answer: responseText });
+
     }
 
     catch {
@@ -209,6 +211,8 @@ resetBtn.addEventListener("click", async () => {
             </p>`;
 
         uploadStatus.textContent = "";
+
+        history = [];
 
     }
 

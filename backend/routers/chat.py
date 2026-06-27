@@ -16,7 +16,7 @@ router = APIRouter(
 @router.post("/")
 async def chat(request: ChatRequest):
 
-    if state.retriever is None:
+    if state.vectorstore is None:
 
         raise HTTPException(
             status_code=400,
@@ -27,7 +27,7 @@ async def chat(request: ChatRequest):
         ask_pdf(
             request.query,
             request.history,
-            state.retriever
+            state.vectorstore
         ),
         media_type="text/plain"
     )

@@ -12,6 +12,8 @@ router = APIRouter(
 def reset():
 
     state.retriever = None
+    
+    history = []
 
     return {
         "message": "Conversation reset successfully."

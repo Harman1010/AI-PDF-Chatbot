@@ -3,7 +3,7 @@ import os
 
 from source.loaders import load_pdf
 from source.chunks import recursive_chunks
-from source.vectorstore import build_vectorstore,get_retriever
+from source.vectorstore import build_vectorstore
 
 from backend import state
 
@@ -39,8 +39,7 @@ async def upload_pdf(file: UploadFile = File(...)):
         # Build vector store
         vectorstore = build_vectorstore(chunks)
 
-        # Store retriever globally
-        state.retriever = get_retriever(vectorstore)
+        state.vectorstore = vectorstore
 
         return {
             "message": "PDF processed successfully."

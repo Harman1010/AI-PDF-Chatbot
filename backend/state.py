@@ -1,1 +1,1 @@
-retriever = None
+vectorstore = None
