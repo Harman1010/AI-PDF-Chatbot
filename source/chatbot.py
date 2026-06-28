@@ -2,6 +2,7 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 
 from source.config import API_KEY
 from source.rerank import rerank
+from source.guardrails import validate_input
 
 model = ChatGoogleGenerativeAI(
     model="gemini-2.5-flash",
@@ -14,15 +15,21 @@ max_K = 10
 
 def ask_pdf(query,history,vectorstore):
 
+    allowed,message = validate_input(query)
+
+    if not allowed:
+        yield message
+        return
+
     results = vectorstore.similarity_search_with_score(
         query,k=max_K
     )
 
-    top_docs = []
-
     if not results:
         yield "I couldn't find relevant information in the uploaded document."
         return
+
+    top_docs = []
 
     for doc,score in results:
         if score < threshold:
@@ -33,7 +40,7 @@ def ask_pdf(query,history,vectorstore):
             doc for doc,score in results[:min_K]
         ]
 
-    top_docs = rerank(query,top_docs,)
+    top_docs = rerank(query,top_docs)
 
     context = "\n\n".join(
         [doc.page_content for doc in top_docs]
