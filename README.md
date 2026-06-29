@@ -174,23 +174,7 @@ The application uses **Gemini 2.5 Flash** for answer generation, while **Groq (L
 
 ### Evaluation Dashboard
 
-Create a folder named:
-
-```text
-images/
-```
-
-Save your screenshot as:
-
-```text
-langsmith_dashboard.png
-```
-
-Then include:
-
-```markdown
 ![LangSmith Evaluation](images/langsmith_dashboard.png)
-```
 
 ### Evaluation Summary
 
