@@ -10,7 +10,7 @@ An AI-powered document question-answering system that uses Retrieval-Augmented G
 * Semantic search using vector embeddings
 * Dynamic Top-K retrieval based on similarity threshold
 * CrossEncoder reranking for improved retrieval quality
-* Context-grounded answer generation using Gemini 2.5 Flash
+* Context-grounded answer generation through an LLM Gateway with automatic provider failover (Gemini, Groq, and Mistral).
 * Real-time streaming responses
 * Conversation history support
 * Markdown response rendering
@@ -50,12 +50,20 @@ Dynamic Top-K Filtering
   │
   ▼
 CrossEncoder Reranking
-  │
-  ▼
-Gemini 2.5 Flash
-  │
-  ▼
-Streaming Response
+        │
+        ▼
+LLM Gateway
+        │
+        ├──────────────┐
+        ▼              ▼
+ Gemini 2.5 Flash   Groq Llama 3.3 70B
+        │              │
+        └──────┬───────┘
+               ▼
+        Mistral Small
+               │
+               ▼
+     Streaming Response
 ```
 
 ---
@@ -82,9 +90,10 @@ When a user asks a question:
 4. Dynamic Top-K filters chunks using an empirically tuned similarity threshold.
 5. If fewer than two chunks satisfy the threshold, the system falls back to the two best retrieved chunks.
 6. A CrossEncoder reranks the retrieved chunks based on query-document relevance.
-7. The highest-ranked chunks are passed to Gemini 2.5 Flash.
-8. Gemini generates a grounded answer using only the retrieved context.
-9. The response is streamed back to the frontend in real time.
+7. The reranked context is forwarded to an LLM Gateway.
+8. The gateway first attempts answer generation using Gemini 2.5 Flash.
+9. If the primary provider is unavailable, the gateway automatically falls back to Groq and then Mistral.
+10. The generated response is streamed back to the frontend in real time.
 
 ---
 
@@ -112,7 +121,13 @@ When a user asks a question:
 
 ### LLM
 
-* Gemini 2.5 Flash
+• Gemini 2.5 Flash
+• Groq (Llama 3.3 70B)
+• Mistral Small
+
+### Infrastructure
+
+• Custom LLM Gateway
 
 ---
 
@@ -154,11 +169,34 @@ Queries matching these patterns are rejected before retrieval, ensuring the assi
 
 ---
 
+# LLM Gateway
+
+The application abstracts all language model providers behind a custom LLM Gateway.
+
+Instead of coupling the RAG pipeline to a single provider, the gateway exposes a common streaming interface while managing provider selection and automatic failover.
+
+Current provider priority:
+
+Gemini
+    ↓
+Groq
+    ↓
+Mistral
+
+Benefits:
+
+* Provider-independent RAG pipeline
+* Automatic failover when a provider is unavailable
+* Unified streaming interface across different SDKs
+* Easily extensible to additional LLM providers
+
+---
+
 # RAG Evaluation
 
 The retrieval pipeline was evaluated using **LangSmith** with a manually curated benchmark dataset consisting of document-grounded question-answer pairs.
 
-The application uses **Gemini 2.5 Flash** for answer generation, while **Groq (Llama 3.3 70B)** is used as an independent LLM judge for automated evaluation.
+The application uses the LLM Gateway for answer generation (**Gemini** as the primary provider), while **Groq (Llama 3.3 70B)** is used independently as an LLM judge for automated evaluation.
 
 ### Evaluation Setup
 
@@ -191,32 +229,16 @@ The application uses **Gemini 2.5 Flash** for answer generation, while **Groq (L
 * The system consistently rejected questions unrelated to the uploaded document.
 * Evaluation highlighted edge cases where a concept was mentioned in the document but not explicitly explained, demonstrating the trade-off between strict grounding and providing helpful summaries.
 
-
-# Current Features
-
-* PDF Upload
-* Semantic Search
-* Dynamic Top-K Retrieval
-* CrossEncoder Reranking
-* Prompt Injection Guardrails
-* Grounded Answer Generation
-* Streaming Responses
-* Conversation History
-* Markdown Rendering
-* Source Citations
-* LangSmith Evaluation Pipeline
-
----
-
 # Future Improvements
 
 * Hybrid Search (BM25 + Dense Retrieval)
 * Multi-document Retrieval
 * Output Guardrails
-* Hybrid Retrieval Evaluation (RAGAS / DeepEval)
-* Model Gateway (Gemini / Groq)
+* RAGAS / DeepEval Evaluation
+* Circuit Breaker & Provider Health Checks
 * Agentic Routing with Web Search Fallback
-* Deployment
+* Response Caching
+* Docker & Cloud Deployment
 
 
 ---
@@ -236,9 +258,7 @@ Through this project I gained practical experience with:
 * Streaming LLM responses
 * Frontend-backend integration
 * Building end-to-end AI applications
+* Building a provider-agnostic LLM Gateway
+* Designing resilient AI systems with automatic model failover
 
 ---
-
-# Project Status
-
-The project currently implements a production-inspired RAG pipeline with semantic retrieval, Dynamic Top-K filtering, reranking, streaming responses, and grounded answer generation. Additional work is planned to improve robustness through hybrid retrieval, evaluation, guardrails, and intelligent routing.

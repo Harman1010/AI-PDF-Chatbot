@@ -1,13 +1,7 @@
-from langchain_google_genai import ChatGoogleGenerativeAI
-
-from source.config import API_KEY
 from source.rerank import rerank
 from source.guardrails import validate_input
 
-model = ChatGoogleGenerativeAI(
-    model="gemini-2.5-flash",
-    api_key=API_KEY
-)
+from source.gateway import stream
 
 threshold = 1.82
 min_K = 2
@@ -86,17 +80,15 @@ Answer:
 
     try:
 
-        response = model.stream(prompt)
+        response = stream(prompt)
 
         answer = ""
 
         for chunk in response:
 
-            if chunk.content:
+            answer += chunk
 
-                answer += chunk.content
-
-                yield chunk.content
+            yield chunk
 
         if "document does not contain" not in answer.lower():
 
