@@ -39,6 +39,8 @@ async def upload_pdf(file: UploadFile = File(...)):
         # Build vector store
         vectorstore = build_vectorstore(chunks)
 
+        vectorstore.save_local("faiss_index")
+
         state.vectorstore = vectorstore
 
         return {

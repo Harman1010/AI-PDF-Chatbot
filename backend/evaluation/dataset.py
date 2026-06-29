@@ -1,4 +1,7 @@
 from langsmith import Client
+from dotenv import load_dotenv
+
+load_dotenv()
 
 client = Client()
 

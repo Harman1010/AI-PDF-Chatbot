@@ -139,17 +139,88 @@ Unlike embedding similarity, the CrossEncoder jointly evaluates the user query a
 
 ---
 
+# Guardrails
+
+The application includes lightweight input guardrails to mitigate prompt injection attacks before the retrieval pipeline is executed.
+
+Current guardrails detect common prompt injection patterns such as attempts to:
+
+* Ignore previous instructions
+* Reveal system prompts
+* Override document context
+* Perform jailbreak-style requests
+
+Queries matching these patterns are rejected before retrieval, ensuring the assistant remains focused on the uploaded document.
+
+---
+
+# RAG Evaluation
+
+The retrieval pipeline was evaluated using **LangSmith** with a manually curated benchmark dataset consisting of document-grounded question-answer pairs.
+
+The application uses **Gemini 2.5 Flash** for answer generation, while **Groq (Llama 3.3 70B)** is used as an independent LLM judge for automated evaluation.
+
+### Evaluation Setup
+
+| Component            | Implementation                            |
+| -------------------- | ----------------------------------------- |
+| Answer Generation    | Gemini 2.5 Flash                          |
+| Retrieval            | FAISS + Dynamic Top-K                     |
+| Reranking            | CrossEncoder (MS MARCO MiniLM)            |
+| Evaluation Framework | LangSmith                                 |
+| LLM Judge            | Groq (Llama 3.3 70B)                      |
+| Evaluation Metrics   | Correctness, Relevance, Concision         |
+| Benchmark Dataset    | 5 document-grounded question-answer pairs |
+
+### Evaluation Dashboard
+
+Create a folder named:
+
+```text
+images/
+```
+
+Save your screenshot as:
+
+```text
+langsmith_dashboard.png
+```
+
+Then include:
+
+```markdown
+![LangSmith Evaluation](images/langsmith_dashboard.png)
+```
+
+### Evaluation Summary
+
+| Metric      | Average Score | Description                                                                           |
+| ----------- | :-----------: | ------------------------------------------------------------------------------------- |
+| Correctness |    **0.68**   | LLM-judged factual correctness compared with reference answers.                       |
+| Relevance   |    **0.60**   | Measures whether the generated response directly addresses the user's query.          |
+| Concision   |    **0.60**   | Measures whether generated responses remain concise relative to the reference answer. |
+
+### Observations
+
+* Dynamic Top-K successfully reduced irrelevant context supplied to the language model.
+* CrossEncoder reranking improved the ordering of retrieved chunks before answer generation.
+* The system consistently rejected questions unrelated to the uploaded document.
+* Evaluation highlighted edge cases where a concept was mentioned in the document but not explicitly explained, demonstrating the trade-off between strict grounding and providing helpful summaries.
+
+
 # Current Features
 
 * PDF Upload
 * Semantic Search
-* Grounded Answer Generation
 * Dynamic Top-K Retrieval
 * CrossEncoder Reranking
+* Prompt Injection Guardrails
+* Grounded Answer Generation
 * Streaming Responses
 * Conversation History
 * Markdown Rendering
 * Source Citations
+* LangSmith Evaluation Pipeline
 
 ---
 
@@ -157,11 +228,12 @@ Unlike embedding similarity, the CrossEncoder jointly evaluates the user query a
 
 * Hybrid Search (BM25 + Dense Retrieval)
 * Multi-document Retrieval
-* LLM Guardrails
-* Automated RAG Evaluation
+* Output Guardrails
+* Hybrid Retrieval Evaluation (RAGAS / DeepEval)
 * Model Gateway (Gemini / Groq)
 * Agentic Routing with Web Search Fallback
 * Deployment
+
 
 ---
 
