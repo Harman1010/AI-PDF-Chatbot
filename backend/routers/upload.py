@@ -4,6 +4,7 @@ import os
 from source.loaders import load_pdf
 from source.chunks import recursive_chunks
 from source.vectorstore import build_vectorstore
+from source.ocr import apply_ocr_if_needed
 
 from backend import state
 
@@ -33,6 +34,7 @@ async def upload_pdf(file: UploadFile = File(...)):
         # Load PDF
         documents = load_pdf(temp_path)
 
+        #documents = apply_ocr_if_needed(temp_path,documents)
         # Chunk documents
         chunks = recursive_chunks(documents)
 
