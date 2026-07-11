@@ -4,3 +4,10 @@ __pycache__/
 chroma_db/
 *.pyc
 data/*.pdf
+*.pdf
+data/
+faiss_indexes/
+temp_*.pdf
+desktop.ini
+Thumbs.db
+faiss_index/
