@@ -6,7 +6,7 @@ from source.chunks import recursive_chunks
 from source.vectorstore import build_vectorstore
 from source.ocr import apply_ocr_if_needed
 
-from backend import state
+from source.session import create_session,create_session_directory
 
 router = APIRouter(
     prefix="/upload",
@@ -38,15 +38,17 @@ async def upload_pdf(file: UploadFile = File(...)):
         # Chunk documents
         chunks = recursive_chunks(documents)
 
-        # Build vector store
+        session_id = create_session()
+
+        session_path = create_session_directory(session_id)
+
         vectorstore = build_vectorstore(chunks)
 
-        vectorstore.save_local("faiss_index")
-
-        state.vectorstore = vectorstore
+        vectorstore.save_local(str(session_path))
 
         return {
-            "message": "PDF processed successfully."
+            "message" : "PDF processed successfully!",
+            "session_id" : session_id
         }
 
     except Exception as e:
