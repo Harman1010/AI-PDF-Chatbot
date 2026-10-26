@@ -9,7 +9,14 @@ def create_session()->str:
 
 def get_session_path(session_id:str)->Path:
     """Returns the directory where this id's faiss index is stored"""
-    return BASE_DIR / session_id
+
+    try:
+        validate = uuid.UUID(session_id)
+
+    except (ValueError, TypeError, AttributeError):
+        raise ValueError("Invalid session ID") from None
+
+    return BASE_DIR / str(validate)
 
 def create_session_directory(session_id:str)->Path:
     """Creates the session's directory if it doesn't exist"""

@@ -1,5 +1,6 @@
 from fastapi import APIRouter, UploadFile, File, HTTPException
 import os
+import tempfile
 
 from source.loaders import load_pdf
 from source.chunks import recursive_chunks
@@ -23,13 +24,32 @@ async def upload_pdf(file: UploadFile = File(...)):
             detail="Only PDF files are allowed."
         )
 
-    temp_path = f"temp_{file.filename}"
+    temp_path = None
+
+    MAX_LIMIT = 10 * 1024 * 1024
+    CHUNK_SIZE = 1024 * 1024
 
     try:
+         # Save uploaded PDF
+        with tempfile.NamedTemporaryFile(mode="wb",suffix=".pdf",delete=False) as buffer:
+            temp_path = buffer.name
+            total_size = 0
 
-        # Save uploaded PDF
-        with open(temp_path, "wb") as buffer:
-            buffer.write(await file.read())
+            while True:
+                chunk = await file.read(CHUNK_SIZE)
+
+                if not chunk:
+                    break
+
+                total_size += len(chunk)
+
+                if total_size > MAX_LIMIT:
+                    raise HTTPException(
+                        status_code=413,
+                        detail="PDF exceeds the 10 MB upload limit."
+                    )
+
+                buffer.write(chunk)
 
         # Load PDF
         documents = load_pdf(temp_path)
@@ -50,6 +70,10 @@ async def upload_pdf(file: UploadFile = File(...)):
             "message" : "PDF processed successfully!",
             "session_id" : session_id
         }
+
+    except HTTPException:
+
+        raise
 
     except Exception as e:
 

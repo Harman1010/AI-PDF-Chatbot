@@ -17,7 +17,12 @@ router = APIRouter(
 @router.post("/")
 async def chat(request: ChatRequest):
 
-    vectorstore = load_vectorstore(request.session_id)
+    try:
+        vectorstore = load_vectorstore(request.session_id)
+
+    except ValueError:
+
+        raise HTTPException(status_code=400,detail="Invalid session ID") from None
 
     if vectorstore is None:
         raise HTTPException(status_code=404,detail="Unable to find active session. Please upload a document")
