@@ -1,5 +1,7 @@
 let history = [];
 
+let sessionID = "";
+
 const fileInput = document.getElementById("pdf-file");
 const uploadBtn = document.getElementById("upload-btn");
 
@@ -31,7 +33,7 @@ uploadBtn.addEventListener("click", async () => {
     try {
 
         const response = await fetch(
-            "https://harman1010-rag-backend.hf.space/upload/",
+            "http://127.0.0.1:8000/upload/",
             {
                 method: "POST",
                 body: formData
@@ -40,6 +42,14 @@ uploadBtn.addEventListener("click", async () => {
 
         const data = await response.json();
 
+        if(!response.ok) {
+            throw new Error(data.detail || "Upload Failed!")
+        }
+
+        sessionID = data.session_id;
+
+        history = [];
+
         uploadStatus.textContent =
             "Document uploaded successfully!";
 
@@ -47,10 +57,9 @@ uploadBtn.addEventListener("click", async () => {
 
     }
 
-    catch {
+    catch (error) {
 
-        uploadStatus.textContent =
-            "Upload failed!";
+        uploadStatus.textContent = error.message;
 
     }
 
@@ -106,7 +115,7 @@ async function sendMessage() {
     try {
 
         const response = await fetch(
-            "https://harman1010-rag-backend.hf.space/chat/",
+            "http://127.0.0.1:8000/chat/",
             {
 
                 method: "POST",
@@ -117,11 +126,17 @@ async function sendMessage() {
 
                 body: JSON.stringify({
                     query: question,
-                    history: history
+                    history: history,
+                    session_id: sessionID
                 })
 
             }
         );
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.detail || "Chat request failed");
+        }
 
         const reader = response.body.getReader();
 
@@ -162,12 +177,11 @@ async function sendMessage() {
 
     }
 
-    catch {
+    catch (error) {
 
         clearTimeout(generatingTimer);
 
-        aiText.textContent =
-            "Something went wrong";
+        aiText.textContent = error.message || "Something went wrong";
 
     }
 
@@ -194,32 +208,16 @@ questionInput.addEventListener(
 );
 
 
-resetBtn.addEventListener("click", async () => {
+resetBtn.addEventListener("click", () => {
 
-    try {
+    chatBox.innerHTML =
+        `<p class="bot-message">
+            👋 Conversation cleared! You can continue asking about your uploaded PDF.
+        </p>`;
 
-        await fetch(
-            "https://harman1010-rag-backend.hf.space/reset/",
-            {
-                method: "POST"
-            }
-        );
+    uploadStatus.textContent = "";
 
-        chatBox.innerHTML =
-            `<p class="bot-message">
-                👋 Welcome! Upload a document to begin.
-            </p>`;
+    history = [];
 
-        uploadStatus.textContent = "";
-
-        history = [];
-
-    }
-
-    catch {
-
-        alert("Reset Failed");
-
-    }
 
 });
