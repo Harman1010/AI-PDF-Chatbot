@@ -1,6 +1,7 @@
 from fastapi import APIRouter, UploadFile, File, HTTPException
 import os
 import tempfile
+import shutil
 
 from source.loaders import load_pdf
 from source.chunks import recursive_chunks
@@ -25,6 +26,8 @@ async def upload_pdf(file: UploadFile = File(...)):
         )
 
     temp_path = None
+
+    session_path = None
 
     MAX_LIMIT = 10 * 1024 * 1024
     CHUNK_SIZE = 1024 * 1024
@@ -72,17 +75,22 @@ async def upload_pdf(file: UploadFile = File(...)):
         }
 
     except HTTPException:
-
+        if session_path and session_path.exists():
+            shutil.rmtree(session_path)
         raise
 
     except Exception as e:
+        if session_path and session_path.exists():
+            shutil.rmtree(session_path)
 
         raise HTTPException(
             status_code=500,
             detail=f"Error processing PDF: {str(e)}"
-        )
+        ) from e
 
     finally:
 
-        if os.path.exists(temp_path):
+        if temp_path and os.path.exists(temp_path):
             os.remove(temp_path)
+
+        await file.close()
