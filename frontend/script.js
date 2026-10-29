@@ -115,7 +115,7 @@ async function sendMessage() {
     try {
 
         const response = await fetch(
-            "https://harman1010-rag-backend.hf.space",
+            "https://harman1010-rag-backend.hf.space/chat/,
             {
 
                 method: "POST",
