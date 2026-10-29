@@ -33,7 +33,7 @@ uploadBtn.addEventListener("click", async () => {
     try {
 
         const response = await fetch(
-            "http://127.0.0.1:8000/upload/",
+            "https://harman1010-rag-backend.hf.space",
             {
                 method: "POST",
                 body: formData
@@ -115,7 +115,7 @@ async function sendMessage() {
     try {
 
         const response = await fetch(
-            "http://127.0.0.1:8000/chat/",
+            "https://harman1010-rag-backend.hf.space",
             {
 
                 method: "POST",
