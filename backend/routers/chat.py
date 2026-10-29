@@ -7,6 +7,12 @@ from source.vectorLoader import load_vectorstore
 
 from source.chatbot import ask_pdf
 
+from fastapi import APIRouter, HTTPException, Depends
+from sqlalchemy.orm import Session
+
+from backend.database import get_db
+from backend.models import Document
+
 
 router = APIRouter(
     prefix="/chat",
@@ -15,7 +21,17 @@ router = APIRouter(
 
 
 @router.post("/")
-async def chat(request: ChatRequest):
+async def chat(request: ChatRequest,db : Session = Depends(get_db)):
+
+    document = db.query(Document).filter(Document.session_id == request.session_id).first()
+
+    if document is None:
+
+        raise HTTPException(status_code=404,detail="Document not found. Please upload a document")
+
+    if document.status != "ready":
+        raise HTTPException(status_code=409,detail="Document is not ready for chatting")
+
 
     try:
         vectorstore = load_vectorstore(request.session_id)
