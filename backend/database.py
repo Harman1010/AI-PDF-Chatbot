@@ -1,31 +1,36 @@
-from pathlib import Path
+import os
 
+from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase, sessionmaker, Session
-
 from collections.abc import Generator
 
-BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv()
 
-DATA_DIR = BASE_DIR / "data"
-DATA_DIR.mkdir(parents=True, exist_ok=True)
+DATABASE_URL = os.getenv("DATABASE_URL")
 
-DATABASE_URL = f"sqlite:///{DATA_DIR / 'app.db'}"
+if not DATABASE_URL:
+    raise RuntimeError("DATABASE_URL environment variable is not configured.")
 
-engine = create_engine(DATABASE_URL,connect_args={"check_same_thread": False})
+engine = create_engine(
+    DATABASE_URL,
+    pool_pre_ping=True
+)
 
-SessionLocal = sessionmaker(autocommit=False,autoflush=False,bind=engine)
+SessionLocal = sessionmaker(
+    autocommit=False,
+    autoflush=False,
+    bind=engine
+)
+
 
 class Base(DeclarativeBase):
     pass
 
-def get_db() -> Generator[Session,None,None]:
 
+def get_db() -> Generator[Session, None, None]:
     db = SessionLocal()
-
     try:
-    
         yield db
-
     finally:
         db.close()
