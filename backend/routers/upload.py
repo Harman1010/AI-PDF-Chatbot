@@ -1,8 +1,10 @@
 from sqlalchemy.orm import Session
 from fastapi import Depends
 
+from backend.auth_dependencies import get_current_user
 from backend.database import get_db
 from backend.models import Document
+from backend.users import User
 
 from fastapi import APIRouter, UploadFile, File, HTTPException
 import os
@@ -22,7 +24,7 @@ router = APIRouter(
 
 
 @router.post("/")
-async def upload_pdf(file: UploadFile = File(...),db : Session = Depends(get_db)):
+async def upload_pdf(file: UploadFile = File(...),db : Session = Depends(get_db),current_user = Depends(get_current_user)):
 
     if not file.filename.endswith(".pdf"):
         raise HTTPException(
@@ -74,7 +76,7 @@ async def upload_pdf(file: UploadFile = File(...),db : Session = Depends(get_db)
 
         vectorstore.save_local(str(session_path))
 
-        document = Document(filename=file.filename,session_id=session_id,status="ready")
+        document = Document(user_id = current_user.id,filename=file.filename,session_id=session_id,status="ready")
 
         db.add(document)
         db.commit()

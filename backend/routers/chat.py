@@ -13,6 +13,8 @@ from sqlalchemy.orm import Session
 from backend.database import get_db
 from backend.models import Document
 
+from backend.auth_dependencies import get_current_user
+
 
 router = APIRouter(
     prefix="/chat",
@@ -21,9 +23,9 @@ router = APIRouter(
 
 
 @router.post("/")
-async def chat(request: ChatRequest,db : Session = Depends(get_db)):
+async def chat(request: ChatRequest,db : Session = Depends(get_db),current_user = Depends(get_current_user)):
 
-    document = db.query(Document).filter(Document.session_id == request.session_id).first()
+    document = db.query(Document).filter(Document.session_id == request.session_id,Document.user_id == current_user.id).first()
 
     if document is None:
 
