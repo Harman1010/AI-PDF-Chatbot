@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from backend.routers import upload,chat,reset,auth
+from backend.routers import upload,chat,reset,auth,documents
 
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -23,6 +23,7 @@ app.include_router(upload.router)
 app.include_router(chat.router)
 app.include_router(reset.router)
 app.include_router(auth.router)
+app.include_router(documents.router)
 
 
 @app.get("/")
