@@ -49,5 +49,20 @@ def remove_document(session_id : str , db : Session = Depends(get_db), curr_user
     if session_path.exists():
         shutil.rmtree(session_path)
 
+    try:
+        db.delete(document)
+        db.commit()
+
+    except Exception:
+        db.rollback()
+        raise HTTPException(
+            status_code=500,
+            detail="Failed to delete document record."
+        )
+
+    return {
+        "message" : "Document removed successfully"
+    }
+
 
 
