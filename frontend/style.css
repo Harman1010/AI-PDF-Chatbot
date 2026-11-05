@@ -164,3 +164,39 @@ button:hover {
     font-weight: bold;
 
 }
+
+/* Authentication */
+
+#auth-section {
+    max-width: 400px;
+    margin: 0 auto 25px;
+    text-align: center;
+}
+
+#auth-section h2 {
+    margin-bottom: 20px;
+    color: #2563eb;
+}
+
+#auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+#auth-form input {
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 16px;
+}
+
+#auth-status {
+    color: #dc2626;
+    font-size: 14px;
+}
+
+#app-section[hidden],
+#auth-section[hidden] {
+    display: none;
+}

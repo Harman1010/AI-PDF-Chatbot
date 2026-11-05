@@ -2,15 +2,10 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
-
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
     <title>AI Document Assistant</title>
-
     <link rel="stylesheet" href="style.css">
-
 </head>
 
 <body>
@@ -18,59 +13,121 @@
     <div class="container">
 
         <header>
-
             <h1>AI Document Assistant</h1>
-
             <p>
                 Upload a document and ask questions using AI-powered semantic search.
             </p>
-
         </header>
 
+        <!-- Authentication Section -->
+        <section id="auth-section">
 
-        <section class="upload-section">
+            <h2>Welcome</h2>
 
-            <input type="file" id="pdf-file" accept=".pdf">
+            <div id="auth-form">
 
-            <p id="upload-status"></p>
+                <input
+                    type="email"
+                    id="auth-email"
+                    placeholder="Email address"
+                    autocomplete="email"
+                    required
+                >
 
-            <button id="upload-btn">
-                Upload Document
-            </button>
+                <input
+                    type="password"
+                    id="auth-password"
+                    placeholder="Password"
+                    autocomplete="current-password"
+                    required
+                >
 
-        </section>
-
-
-        <section class="chat-section">
-
-            <div id="chat-box">
-
-                <p class="bot-message">
-                    👋 Welcome! Upload a document to begin.
-                </p>
-
-            </div>
-
-            <div class="input-area">
-
-                <input type="text" id="question" placeholder="Ask a question...">
-
-                <button id="send-btn">
-                    Send
+                <button id="login-btn" type="button">
+                    Login
                 </button>
 
+                <button id="register-btn" type="button">
+                    Register
+                </button>
+
+                <p id="auth-status"></p>
+
             </div>
 
         </section>
 
+        <!-- Main Application Section -->
+        <div id="app-section" hidden>
 
-        <section class="reset-section">
+            <div class="user-section">
+                <p id="user-email"></p>
 
-            <button id="reset-btn">
-                Reset Conversation
-            </button>
+                <button id="logout-btn" type="button">
+                    Logout
+                </button>
+            </div>
 
-        </section>
+            <!-- Upload Section -->
+            <section class="upload-section">
+
+                <input type="file" id="pdf-file" accept=".pdf">
+
+                <p id="upload-status"></p>
+
+                <button id="upload-btn" type="button">
+                    Upload Document
+                </button>
+
+            </section>
+
+            <!-- Document List -->
+            <section class="documents-section">
+
+                <h2>My Documents</h2>
+
+                <div id="documents-list">
+                    <p>No documents loaded.</p>
+                </div>
+
+            </section>
+
+            <!-- Chat Section -->
+            <section class="chat-section">
+
+                <div id="chat-box">
+
+                    <p class="bot-message">
+                        👋 Welcome! Upload a document to begin.
+                    </p>
+
+                </div>
+
+                <div class="input-area">
+
+                    <input
+                        type="text"
+                        id="question"
+                        placeholder="Ask a question..."
+                    >
+
+                    <button id="send-btn" type="button">
+                        Send
+                    </button>
+
+                </div>
+
+            </section>
+
+            <!-- Reset Section -->
+            <section class="reset-section">
+
+                <button id="reset-btn" type="button">
+                    Reset Conversation
+                </button>
+
+            </section>
+
+        </div>
 
     </div>
 
